@@ -24,8 +24,8 @@ type DBConfig struct {
 	Driver   string `yaml:"driver"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
-	Name     string `yaml:"name"`
 	Server   string `yaml:"server"`
+	Name     string `yaml:"name"`
 }
 
 func (cfg *DBConfig) GetConnection() (string, error) {
@@ -40,27 +40,27 @@ func (cfg *DBConfig) GetConnection() (string, error) {
 		return "", EMPTY_DB_SERVER
 	}
 
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", cfg.User, cfg.Password, cfg.Name, cfg.Server), nil
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", cfg.User, cfg.Password, cfg.Server, cfg.Name), nil
 }
 
 var (
 	sysConfig Config
 )
 
-func LoadConfigFile(path string) error {
+func LoadConfigFile(path string) (Config, error) {
 	var config Config
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return err
+		return config, err
 	}
 
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		return err
+		return config, err
 	}
 
 	// TODO: add lock?
 	sysConfig = config
 
-	return nil
+	return config, nil
 }

@@ -13,11 +13,11 @@ func TestGetConnection(t *testing.T) {
 		conn string
 		err  error
 	}{
-		{DBConfig{"mysql", "user", "passwd", "name", "server"}, "user:passwd@tcp(name)/server?charset=utf8", nil},
-		{DBConfig{"mysql", "", "passwd", "name", "server"}, "", EMPTY_DB_USER_OR_PASSWD},
-		{DBConfig{"mysql", "user", "", "name", "server"}, "", EMPTY_DB_USER_OR_PASSWD},
-		{DBConfig{"mysql", "user", "passwd", "", "server"}, "", EMPTY_DB_NAME},
-		{DBConfig{"mysql", "user", "passwd", "name", ""}, "", EMPTY_DB_SERVER},
+		{DBConfig{"mysql", "user", "passwd", "server", "name"}, "user:passwd@tcp(server)/name?charset=utf8", nil},
+		{DBConfig{"mysql", "", "passwd", "server", "name"}, "", EMPTY_DB_USER_OR_PASSWD},
+		{DBConfig{"mysql", "user", "", "server", "name"}, "", EMPTY_DB_USER_OR_PASSWD},
+		{DBConfig{"mysql", "user", "passwd", "", "name"}, "", EMPTY_DB_SERVER},
+		{DBConfig{"mysql", "user", "passwd", "server", ""}, "", EMPTY_DB_NAME},
 	}
 
 	for _, c := range cases {
@@ -38,7 +38,7 @@ func TestLoadConfigFile(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		err := LoadConfigFile(filepath.Join("testdata", c.name))
+		_, err := LoadConfigFile(filepath.Join("testdata", c.name))
 		assert.Equal(t, c.expected, err == nil, "Failed to load config file: "+c.name)
 	}
 }
