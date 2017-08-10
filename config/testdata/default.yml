@@ -1,0 +1,7 @@
+loglevel: info
+db:
+  driver: mysql
+  user: test
+  password: test
+  name: ocidb
+  server: localhost:3306
