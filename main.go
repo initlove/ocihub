@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
 
 	"github.com/initlove/ocihub/config"
 	"github.com/initlove/ocihub/models"
+	"github.com/initlove/ocihub/routers"
 )
 
 func main() {
@@ -20,17 +20,11 @@ func main() {
 		return
 	}
 
-	ns := beego.NewNamespace("/v1",
-		beego.NSCond(func(ctx *context.Context) bool {
-			fmt.Println("we get v1")
-			return true
-		}),
-		beego.NSGet("/version", func(ctx *context.Context) {
-			fmt.Println("we get version")
-			ctx.Output.Body([]byte("1.0"))
-		}),
-	)
+	nss := router.GetNamespaces()
+	for name, ns := range nss {
+		fmt.Println("we are adding ns: ", name)
+		beego.AddNamespace(ns)
+	}
 
-	beego.AddNamespace(ns)
 	beego.Run()
 }
