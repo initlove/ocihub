@@ -29,7 +29,7 @@ func TestGetConnection(t *testing.T) {
 
 func TestLoadConfigFile(t *testing.T) {
 	cases := []struct {
-		name     string
+		file     string
 		expected bool
 	}{
 		{"default.yml", true},
@@ -38,7 +38,29 @@ func TestLoadConfigFile(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		_, err := LoadConfigFile(filepath.Join("testdata", c.name))
-		assert.Equal(t, c.expected, err == nil, "Failed to load config file: "+c.name)
+		_, err := LoadConfigFile(filepath.Join("testdata", c.file))
+		assert.Equal(t, c.expected, err == nil, "Failed to load config file: "+c.file)
 	}
+}
+
+func TestConfigValid(t *testing.T) {
+	cases := []struct {
+		file     string
+		expected bool
+	}{
+		{"default.yml", true},
+		{"invalidsqldriver.yml", false},
+		{"invalidsql.yml", false},
+		{"invalidstorage.yml", false},
+		{"nosql.yml", false},
+	}
+
+	for _, c := range cases {
+		config, _ := LoadConfigFile(filepath.Join("testdata", c.file))
+		assert.Equal(t, c.expected, config.Valid() == nil, "Failed to valid config file: "+c.file)
+	}
+}
+
+func TestConfig(t *testing.T) {
+	assert.Equal(t, sysConfig, GetConfig())
 }

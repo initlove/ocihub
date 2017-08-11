@@ -1,0 +1,4 @@
+loglevel: info
+storage:
+  filesystem:
+    rootDirectory: /tmp/ocidata

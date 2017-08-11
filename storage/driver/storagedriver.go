@@ -1,9 +1,11 @@
 package driver
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
+	"sync"
 
 	"github.com/astaxie/beego/context"
 )
@@ -17,6 +19,9 @@ import (
 type StorageDriver interface {
 	// Create updates the parameters
 	Create(parameters map[string]interface{}) error
+
+	// Valid checks if parameters are sufficient parameters
+	Valid(parameters map[string]interface{}) error
 
 	// Name returns the human-readable "name" of the driver, useful in error
 	// messages and logging. By convention, this will just be the registration
@@ -136,6 +141,39 @@ func (err Error) Error() string {
 	return fmt.Sprintf("%s: %s", err.DriverName, err.Enclosed)
 }
 
+var (
+	sdsLock sync.Mutex
+	sds     = make(map[string]StorageDriver, 8)
+)
+
 func Register(name string, driver StorageDriver) error {
+	if name == "" {
+		return errors.New("Could not register a Storage with an empty name")
+	}
+	if driver == nil {
+		return errors.New("Could not register a nil Storage")
+	}
+
+	sdsLock.Lock()
+	defer sdsLock.Unlock()
+
+	if _, exists := sds[name]; exists {
+		return fmt.Errorf("Storage type '%s' is already registered", name)
+	}
+
+	sds[name] = driver
 	return nil
+}
+
+func FindDriver(name string, params map[string]interface{}) (StorageDriver, error) {
+	for n, d := range sds {
+		if n == name {
+			if err := d.Valid(params); err != nil {
+				return nil, err
+			} else {
+				return d, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("Cannot find '%s' storage driver", name)
 }

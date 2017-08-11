@@ -12,12 +12,42 @@ var (
 	EMPTY_DB_USER_OR_PASSWD = errors.New("The database 'User' or 'Password' should not be empty.")
 	EMPTY_DB_NAME           = errors.New("The database 'Name' should not be empty.")
 	EMPTY_DB_SERVER         = errors.New("The database 'Server' should not be empty.")
+
+	NON_SUPPORTED_DB_DRIVER = errors.New("Only 'mysql' supported yet.")
+	NON_STORAGE_BACKEND     = errors.New("At least one storage backend.")
 )
 
 type Config struct {
-	Port     int64    `yaml:"port"`
-	LogLevel string   `yaml:"loglevel,omitempty"`
-	DB       DBConfig `yaml:"db"`
+	Port     int64  `yaml:"port"`
+	LogLevel string `yaml:"loglevel,omitempty"`
+	// 'dynamic' or 'static'
+	// static: load at the first time
+	// dynamic: load every time, most time because of multiple tenant using their own token/ak-sk
+	// TODO: should have 'default' value
+	StorageLoad string        `yaml:"storageload,omitempty"`
+	Storage     StorageConfig `yaml:"storage"`
+	DB          DBConfig      `yaml:"db"`
+}
+
+func (cfg *Config) Valid() error {
+	if err := cfg.Storage.Valid(); err != nil {
+		return err
+	}
+	if err := cfg.DB.Valid(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type StorageConfig map[string](map[string]interface{})
+
+func (cfg *StorageConfig) Valid() error {
+	if len(*cfg) == 0 {
+		return NON_STORAGE_BACKEND
+	}
+
+	return nil
 }
 
 type DBConfig struct {
@@ -43,6 +73,19 @@ func (cfg *DBConfig) GetConnection() (string, error) {
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", cfg.User, cfg.Password, cfg.Server, cfg.Name), nil
 }
 
+func (cfg *DBConfig) Valid() error {
+	if cfg.Driver != "mysql" {
+		return NON_SUPPORTED_DB_DRIVER
+	}
+
+	_, err := cfg.GetConnection()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 var (
 	sysConfig Config
 )
@@ -58,9 +101,12 @@ func LoadConfigFile(path string) (Config, error) {
 	if err != nil {
 		return config, err
 	}
-
 	// TODO: add lock?
 	sysConfig = config
 
 	return config, nil
+}
+
+func GetConfig() Config {
+	return sysConfig
 }

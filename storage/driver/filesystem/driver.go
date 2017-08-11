@@ -3,6 +3,7 @@ package filesystem
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,8 +17,7 @@ import (
 )
 
 const (
-	driverName           = "filesystem"
-	defaultRootDirectory = "/tmp/ocidata"
+	driverName = "filesystem"
 )
 
 // DriverParameters represents all configuration options available for the
@@ -39,17 +39,26 @@ func (d *driver) Create(parameters map[string]interface{}) error {
 		v := parameters["rootDirectory"].(string)
 		if v != "" {
 			d.rootDirectory = v
+			return nil
 		}
-	} else {
-		d.rootDirectory = defaultRootDirectory
 	}
-	return nil
+
+	return errors.New("Missing 'rootDirectory' data.")
+}
+
+func (d *driver) Valid(parameters map[string]interface{}) error {
+	if parameters != nil {
+		v := parameters["rootDirectory"].(string)
+		if v != "" {
+			return nil
+		}
+	}
+
+	return errors.New("Missing 'rootDirectory' data.")
 }
 
 // Implement the storagedriver.StorageDriver interface
-
 func (d *driver) Name() string {
-	fmt.Println(d.rootDirectory)
 	return driverName
 }
 

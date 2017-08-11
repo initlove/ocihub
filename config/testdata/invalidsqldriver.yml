@@ -1,11 +1,10 @@
 loglevel: info
 db:
-  driver: mysql
+  driver: liangsql
   user: test
   password: test
   name: ocidb
   server: localhost:3306
-storageload: static
 storage:
   filesystem:
     rootDirectory: /tmp/ocidata
