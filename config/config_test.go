@@ -2,6 +2,7 @@ package config
 
 import (
 	"path/filepath"
+
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,7 +28,7 @@ func TestGetConnection(t *testing.T) {
 	}
 }
 
-func TestLoadConfigFile(t *testing.T) {
+func TestInitConfigFromFile(t *testing.T) {
 	cases := []struct {
 		file     string
 		expected bool
@@ -35,10 +36,11 @@ func TestLoadConfigFile(t *testing.T) {
 		{"default.yml", true},
 		{"non-exist.yml", false},
 		{"invalid.yml", false},
+		{"invalidlog.yml", false},
 	}
 
 	for _, c := range cases {
-		_, err := LoadConfigFile(filepath.Join("testdata", c.file))
+		err := InitConfigFromFile(filepath.Join("testdata", c.file))
 		assert.Equal(t, c.expected, err == nil, "Failed to load config file: "+c.file)
 	}
 }
@@ -56,8 +58,9 @@ func TestConfigValid(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		config, _ := LoadConfigFile(filepath.Join("testdata", c.file))
-		assert.Equal(t, c.expected, config.Valid() == nil, "Failed to valid config file: "+c.file)
+		InitConfigFromFile(filepath.Join("testdata", c.file))
+		cfg := GetConfig()
+		assert.Equal(t, c.expected, cfg.Valid() == nil, "Failed to valid config file: "+c.file)
 	}
 }
 

@@ -1,11 +1,11 @@
 log:
   console:
-    level: info
+    level: debug
 db:
   driver: mysql
-  user: test
-  password: test
-  name: ocidb
+  user: root
+  password: root123456
+  name: ocihub
   server: localhost:3306
 storageload: static
 storage:

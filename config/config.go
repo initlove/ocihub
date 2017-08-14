@@ -18,8 +18,9 @@ var (
 )
 
 type Config struct {
-	Port     int64  `yaml:"port"`
-	LogLevel string `yaml:"loglevel,omitempty"`
+	Port int64 `yaml:"port"`
+	// The log validation will be checked in the log init part.
+	Log LogConfig `yaml:"log,omitempty"`
 	// 'dynamic' or 'static'
 	// static: load at the first time
 	// dynamic: load every time, most time because of multiple tenant using their own token/ak-sk
@@ -39,6 +40,8 @@ func (cfg *Config) Valid() error {
 
 	return nil
 }
+
+type LogConfig map[string](map[string]interface{})
 
 type StorageConfig map[string](map[string]interface{})
 
@@ -74,6 +77,7 @@ func (cfg *DBConfig) GetConnection() (string, error) {
 }
 
 func (cfg *DBConfig) Valid() error {
+	//TODO: this should be moved to init db part
 	if cfg.Driver != "mysql" {
 		return NON_SUPPORTED_DB_DRIVER
 	}
@@ -90,21 +94,21 @@ var (
 	sysConfig Config
 )
 
-func LoadConfigFile(path string) (Config, error) {
+func InitConfigFromFile(path string) error {
 	var config Config
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return config, err
+		return err
 	}
 
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		return config, err
+		return err
 	}
 	// TODO: add lock?
 	sysConfig = config
 
-	return config, nil
+	return nil
 }
 
 func GetConfig() Config {

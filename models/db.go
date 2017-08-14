@@ -4,14 +4,16 @@ import (
 	"errors"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/initlove/ocihub/config"
 )
 
-func InitDB(cfg config.DBConfig) error {
+func InitDB() error {
 	var err error
+	cfg := config.GetConfig().DB
 	conn, err := cfg.GetConnection()
 	if err != nil {
 		return err
@@ -33,6 +35,7 @@ func InitDB(cfg config.DBConfig) error {
 			orm.RunSyncdb("default", false, true)
 			return nil
 		}
+		logs.Debug("Try to register database for %d times...", i)
 	}
 
 	return errors.New("Cannot connect to database")

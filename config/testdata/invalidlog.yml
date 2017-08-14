@@ -1,7 +1,12 @@
+log:
+  adapter: console
 db:
   driver: mysql
   user: test
   password: test
+  name: ocidb
+  server: localhost:3306
+storageload: static
 storage:
   filesystem:
     rootDirectory: /tmp/ocidata

@@ -1,10 +1,9 @@
 package router
 
 import (
-	"fmt"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
 )
 
 const (
@@ -18,7 +17,7 @@ func init() {
 func OCINameSpace() *beego.Namespace {
 	ns := beego.NewNamespace(ociPrefix,
 		beego.NSCond(func(ctx *context.Context) bool {
-			fmt.Println("we get v1")
+			logs.Debug("We get v1")
 			return true
 		}),
 		beego.NSGet("/", func(ctx *context.Context) {

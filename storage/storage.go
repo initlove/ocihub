@@ -2,7 +2,8 @@ package storage
 
 import (
 	"errors"
-	"fmt"
+
+	"github.com/astaxie/beego/logs"
 
 	"github.com/initlove/ocihub/config"
 	"github.com/initlove/ocihub/health"
@@ -29,6 +30,7 @@ var (
 func loadDriver() (driver.StorageDriver, error) {
 	cfg := config.GetConfig().Storage
 	for n, paras := range cfg {
+		logs.Debug("Find storage driver for: %s", n)
 		d, err := driver.FindDriver(n, paras)
 		if err == nil {
 			// Pickup the first qualified driver
@@ -43,8 +45,10 @@ func loadDriver() (driver.StorageDriver, error) {
 }
 
 func InitStorage() error {
-	_, err := loadDriver()
+	var err error
+	sysDriver, err = loadDriver()
 	// TODO: we should check the healthy status at the beginning
+
 	return err
 }
 
