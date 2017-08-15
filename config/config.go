@@ -77,11 +77,6 @@ func (cfg *DBConfig) GetConnection() (string, error) {
 }
 
 func (cfg *DBConfig) Valid() error {
-	//TODO: this should be moved to init db part
-	if cfg.Driver != "mysql" {
-		return NON_SUPPORTED_DB_DRIVER
-	}
-
 	_, err := cfg.GetConnection()
 	if err != nil {
 		return err

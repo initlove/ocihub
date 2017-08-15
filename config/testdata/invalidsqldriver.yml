@@ -1,9 +1,0 @@
-db:
-  driver: liangsql
-  user: test
-  password: test
-  name: ocidb
-  server: localhost:3306
-storage:
-  filesystem:
-    rootDirectory: /tmp/ocidata

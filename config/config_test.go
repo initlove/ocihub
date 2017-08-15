@@ -51,7 +51,6 @@ func TestConfigValid(t *testing.T) {
 		expected bool
 	}{
 		{"default.yml", true},
-		{"invalidsqldriver.yml", false},
 		{"invalidsql.yml", false},
 		{"invalidstorage.yml", false},
 		{"nosql.yml", false},

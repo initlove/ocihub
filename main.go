@@ -21,7 +21,9 @@ func main() {
 		logs.Warning(err)
 	}
 
-	if err := models.InitDB(); err != nil {
+	cfg := config.GetConfig().DB
+	conn, _ := cfg.GetConnection()
+	if err := models.InitDB(conn, cfg.Driver, "default"); err != nil {
 		logs.Critical("Error in init db: ", err)
 		return
 	}
