@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 
 	"github.com/initlove/ocihub/models"
+	"github.com/initlove/ocihub/storage"
 )
 
 type OCIV1Tag struct {
@@ -35,12 +37,50 @@ type OCIV1Manifest struct {
 }
 
 func (this *OCIV1Manifest) GetManifest() {
+	reponame := this.Ctx.Input.Param(":splat")
+	tags := this.Ctx.Input.Param(":tags")
+	logs.Debug("GetManifest of '%s:%s'.", reponame, tags)
+
+	data, err := storage.GetManifest(this.Ctx, reponame, tags, "oci", "v1")
+	if err != nil {
+		//		if err == storage.ErrorNotFound {
+		//			CTX_ERROR_WRAP(this.Ctx, http.StatusNotFound, nil, fmt.Sprintf("Cannot find manifest of '%s'.", reponame))
+		//		} else {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to get manifest of '%s:%s'.", reponame, tags))
+		//		}
+		return
+	}
+	CTX_DATA_WRAP(this.Ctx, http.StatusOK, data, nil)
 }
 
 func (this *OCIV1Manifest) PutManifest() {
+	reponame := this.Ctx.Input.Param(":splat")
+	tags := this.Ctx.Input.Param(":tags")
+	logs.Debug("PutManifest of '%s:%s'.", reponame, tags)
+
+	// FIXME, f, h , err
+	f, _, err := this.GetFile("filename")
+	data, _ := ioutil.ReadAll(f)
+	f.Close()
+	err = storage.PutManifest(this.Ctx, reponame, tags, "oci", "v1", data)
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to put manifest of '%s:%s'.", reponame, tags))
+		return
+	}
+	CTX_SUCCESS_WRAP(this.Ctx, http.StatusOK, fmt.Sprintf("Succeed in putting manifest of '%s:%s'.", reponame, tags), nil)
 }
 
 func (this *OCIV1Manifest) DeleteManifest() {
+	reponame := this.Ctx.Input.Param(":splat")
+	tags := this.Ctx.Input.Param(":tags")
+	logs.Debug("DeleteManifest of '%s:%s'.", reponame, tags)
+
+	err := storage.DeleteManifest(this.Ctx, reponame, tags, "oci", "v1")
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to delete manifest of '%s:%s'.", reponame, tags))
+		return
+	}
+	CTX_SUCCESS_WRAP(this.Ctx, http.StatusOK, fmt.Sprintf("Succeed in deleting manifest of '%s:%s'.", reponame, tags), nil)
 }
 
 type OCIV1Blob struct {

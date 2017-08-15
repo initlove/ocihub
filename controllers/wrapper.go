@@ -30,3 +30,13 @@ func CTX_SUCCESS_WRAP(ctx *context.Context, code int, result interface{}, header
 
 	logs.Trace("Succeed in [%s] [%s].", ctx.Input.Method(), ctx.Input.URI())
 }
+
+func CTX_DATA_WRAP(ctx *context.Context, code int, result []byte, header map[string]string) {
+	ctx.Output.SetStatus(code)
+	for n, v := range header {
+		ctx.Output.Header(n, v)
+	}
+	ctx.Output.Body(result)
+
+	logs.Trace("Succeed in [%s] [%s].", ctx.Input.Method(), ctx.Input.URI())
+}
