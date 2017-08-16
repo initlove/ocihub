@@ -5,3 +5,5 @@ db:
 storage:
   filesystem:
     rootDirectory: /tmp/ocidata
+session:
+  inmemory:

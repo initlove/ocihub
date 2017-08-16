@@ -1,5 +1,6 @@
 log:
-  adapter: console
+  console:
+    level: info
 db:
   driver: mysql
   user: test
@@ -11,4 +12,4 @@ storage:
   filesystem:
     rootDirectory: /tmp/ocidata
 session:
-  inmemory:
+  

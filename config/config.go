@@ -13,8 +13,8 @@ var (
 	EMPTY_DB_NAME           = errors.New("The database 'Name' should not be empty.")
 	EMPTY_DB_SERVER         = errors.New("The database 'Server' should not be empty.")
 
-	NON_SUPPORTED_DB_DRIVER = errors.New("Only 'mysql' supported yet.")
-	NON_STORAGE_BACKEND     = errors.New("At least one storage backend.")
+	NON_STORAGE_BACKEND = errors.New("At least one storage backend required.")
+	NON_SESSION_BACKEND = errors.New("At least one session backend required.")
 )
 
 type Config struct {
@@ -28,6 +28,7 @@ type Config struct {
 	StorageLoad string        `yaml:"storageload,omitempty"`
 	Storage     StorageConfig `yaml:"storage"`
 	DB          DBConfig      `yaml:"db"`
+	Session     SessionConfig `yaml:"session"`
 }
 
 func (cfg *Config) Valid() error {
@@ -35,6 +36,9 @@ func (cfg *Config) Valid() error {
 		return err
 	}
 	if err := cfg.DB.Valid(); err != nil {
+		return err
+	}
+	if err := cfg.Session.Valid(); err != nil {
 		return err
 	}
 
@@ -48,6 +52,16 @@ type StorageConfig map[string](map[string]interface{})
 func (cfg *StorageConfig) Valid() error {
 	if len(*cfg) == 0 {
 		return NON_STORAGE_BACKEND
+	}
+
+	return nil
+}
+
+type SessionConfig map[string](map[string]interface{})
+
+func (cfg *SessionConfig) Valid() error {
+	if len(*cfg) == 0 {
+		return NON_SESSION_BACKEND
 	}
 
 	return nil
@@ -89,21 +103,21 @@ var (
 	sysConfig Config
 )
 
-func InitConfigFromFile(path string) error {
+func InitConfigFromFile(path string) (Config, error) {
 	var config Config
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return err
+		return config, err
 	}
 
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		return err
+		return config, err
 	}
 	// TODO: add lock?
 	sysConfig = config
 
-	return nil
+	return config, nil
 }
 
 func GetConfig() Config {

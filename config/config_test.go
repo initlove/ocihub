@@ -40,7 +40,7 @@ func TestInitConfigFromFile(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		err := InitConfigFromFile(filepath.Join("testdata", c.file))
+		_, err := InitConfigFromFile(filepath.Join("testdata", c.file))
 		assert.Equal(t, c.expected, err == nil, "Failed to load config file: "+c.file)
 	}
 }
@@ -54,6 +54,7 @@ func TestConfigValid(t *testing.T) {
 		{"invalidsql.yml", false},
 		{"invalidstorage.yml", false},
 		{"nosql.yml", false},
+		{"invalidsession.yml", false},
 	}
 
 	for _, c := range cases {

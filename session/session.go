@@ -6,6 +6,9 @@ import (
 	"sync"
 
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
+
+	"github.com/initlove/ocihub/config"
 )
 
 type SessionDriver interface {
@@ -44,18 +47,15 @@ func Register(name string, driver SessionDriver) error {
 	return nil
 }
 
-func InitSession(name string, paras map[string]interface{}) error {
-	for n, d := range sds {
-		if name == n {
-			err := d.Init(paras)
-			if err == nil {
-				sysSession = d
-			}
-			return err
+func InitSession(cfg config.SessionConfig) error {
+	for n, v := range cfg {
+		if d, ok := sds[n]; ok {
+			logs.Debug("Init Session Driver: '%s'.", n)
+			return d.Init(v)
 		}
 	}
 
-	return fmt.Errorf("SessionDriver '%s' is not supported.", name)
+	return errors.New("Cannot find supported session driver.")
 }
 
 func New(ctx context.Context) (string, error) {

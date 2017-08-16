@@ -13,7 +13,11 @@ const (
 )
 
 func init() {
-	RegisterRouter(ociV1Prefix, OCIV1NameSpace())
+	if err := RegisterRouter(ociV1Prefix, OCIV1NameSpace()); err != nil {
+		logs.Error("Failed to register router: '%s'.", ociV1Prefix)
+	} else {
+		logs.Debug("Register router '%s' registered.", ociV1Prefix)
+	}
 }
 
 func OCIV1NameSpace() *beego.Namespace {

@@ -166,14 +166,9 @@ func Register(name string, driver StorageDriver) error {
 }
 
 func FindDriver(name string, params map[string]interface{}) (StorageDriver, error) {
-	for n, d := range sds {
-		if n == name {
-			if err := d.Valid(params); err != nil {
-				return nil, err
-			} else {
-				return d, nil
-			}
-		}
+	if d, ok := sds[name]; ok {
+		err := d.Valid(params)
+		return d, err
 	}
 	return nil, fmt.Errorf("Cannot find '%s' storage driver", name)
 }

@@ -89,8 +89,7 @@ func ParseLog(cfg config.LogConfig) (string, string, error) {
 	return "", "", errors.New("Log is not set.")
 }
 
-func InitLogger() error {
-	cfg := config.GetConfig().Log
+func InitLogger(cfg config.LogConfig) error {
 	n, args, err := ParseLog(cfg)
 	if err != nil {
 		logs.SetLogger(logs.AdapterConsole, fmt.Sprintf("{\"level\": %d}", logs.LevelInformational))

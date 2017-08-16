@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
 
 	storagedriver "github.com/initlove/ocihub/storage/driver"
 )
@@ -31,7 +32,11 @@ type driver struct {
 }
 
 func init() {
-	storagedriver.Register(driverName, &driver{})
+	if err := storagedriver.Register(driverName, &driver{}); err != nil {
+		logs.Error("Failed to register Storage driver '%s'.", driverName)
+	} else {
+		logs.Debug("Storage driver '%s' registered.", driverName)
+	}
 }
 
 func (d *driver) Init(parameters map[string]interface{}) error {

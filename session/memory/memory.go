@@ -95,5 +95,7 @@ func (m *Memory) GC() error {
 func init() {
 	if err := session.Register(memoryPrefix, &Memory{}); err != nil {
 		logs.Error("Failed to register memory session driver.")
+	} else {
+		logs.Debug("Session driver '%s' registered.", memoryPrefix)
 	}
 }

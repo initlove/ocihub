@@ -2,40 +2,43 @@ package main
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/logs"
 
 	"github.com/initlove/ocihub/config"
 	"github.com/initlove/ocihub/logger"
 	"github.com/initlove/ocihub/models"
 	"github.com/initlove/ocihub/routers"
+	"github.com/initlove/ocihub/session"
 	"github.com/initlove/ocihub/storage"
+
+	_ "github.com/initlove/ocihub/session/memory"
 	_ "github.com/initlove/ocihub/storage/driver/filesystem"
 )
 
 func main() {
-	if err := config.InitConfigFromFile("conf/ocihub.yml"); err != nil {
+	cfg, err := config.InitConfigFromFile("conf/ocihub.yml")
+	if err != nil {
 		return
 	}
-	if err := logger.InitLogger(); err != nil {
+	if err := logger.InitLogger(cfg.Log); err != nil {
 		logs.Warning(err)
 	}
 
-	cfg := config.GetConfig().DB
-	conn, _ := cfg.GetConnection()
-	if err := models.InitDB(conn, cfg.Driver, "default"); err != nil {
+	conn, _ := cfg.DB.GetConnection()
+	if err := models.InitDB(conn, cfg.DB.Driver, "default"); err != nil {
 		logs.Critical("Error in init db: ", err)
 		return
 	}
 
-	if err := storage.InitStorage(); err != nil {
+	if err := storage.InitStorage(cfg.Storage); err != nil {
 		logs.Critical("Error in init storage: ", err)
 		return
 	}
 
-	// demo of how to put content
-	var ctx context.Context
-	storage.Driver().PutContent(ctx, "/a/b/c", []byte("dliang"))
+	if err := session.InitSession(cfg.Session); err != nil {
+		logs.Critical("Error in init session: ", err)
+		return
+	}
 
 	nss := router.GetNamespaces()
 	for name, ns := range nss {

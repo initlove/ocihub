@@ -27,8 +27,7 @@ var (
 )
 
 // TODO: more logs
-func loadDriver() (driver.StorageDriver, error) {
-	cfg := config.GetConfig().Storage
+func loadDriver(cfg config.StorageConfig) (driver.StorageDriver, error) {
 	for n, paras := range cfg {
 		logs.Debug("Find storage driver for: %s", n)
 		d, err := driver.FindDriver(n, paras)
@@ -44,21 +43,22 @@ func loadDriver() (driver.StorageDriver, error) {
 	return nil, errors.New("Fail to get a suitable storage driver")
 }
 
-func InitStorage() error {
+func InitStorage(cfg config.StorageConfig) error {
 	var err error
-	sysDriver, err = loadDriver()
+	sysDriver, err = loadDriver(cfg)
 	// TODO: we should check the healthy status at the beginning
 
 	return err
 }
 
 func Driver() driver.StorageDriver {
-	if config.GetConfig().StorageLoad == "static" && sysDriver != nil {
+	cfg := config.GetConfig()
+	if cfg.StorageLoad == "static" && sysDriver != nil {
 		return sysDriver
 	}
 
 	var err error
-	sysDriver, err = loadDriver()
+	sysDriver, err = loadDriver(cfg.Storage)
 	if err != nil {
 		panic("Failed to load driver")
 	}

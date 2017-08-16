@@ -4,3 +4,5 @@ db:
   password: test
   name: ocidb
   server: localhost:3306
+session:
+  inmemory:
