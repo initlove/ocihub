@@ -34,7 +34,7 @@ func loadDriver() (driver.StorageDriver, error) {
 		d, err := driver.FindDriver(n, paras)
 		if err == nil {
 			// Pickup the first qualified driver
-			err = d.Create(paras)
+			err = d.Init(paras)
 			if err == nil {
 				return d, nil
 			}

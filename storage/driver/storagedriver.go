@@ -17,8 +17,8 @@ import (
 // Please see the aforementioned factory package for example code showing how to get an instance
 // of a StorageDriver
 type StorageDriver interface {
-	// Create updates the parameters
-	Create(parameters map[string]interface{}) error
+	// Init updates the parameters
+	Init(parameters map[string]interface{}) error
 
 	// Valid checks if parameters are sufficient parameters
 	Valid(parameters map[string]interface{}) error

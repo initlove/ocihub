@@ -13,7 +13,7 @@ type MockDriver struct {
 	name string
 }
 
-func (d *MockDriver) Create(parameters map[string]interface{}) error {
+func (d *MockDriver) Init(parameters map[string]interface{}) error {
 	return nil
 }
 

@@ -34,7 +34,7 @@ func init() {
 	storagedriver.Register(driverName, &driver{})
 }
 
-func (d *driver) Create(parameters map[string]interface{}) error {
+func (d *driver) Init(parameters map[string]interface{}) error {
 	if parameters != nil {
 		v := parameters["rootDirectory"].(string)
 		if v != "" {

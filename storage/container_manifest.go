@@ -8,7 +8,7 @@ import (
 )
 
 func ComposeManifestPath(repo string, tag string, proto string, proto_version string) string {
-	return fmt.Sprintf("%s/%s/%s/manifests/%s", proto, proto_version, repo, tag)
+	return fmt.Sprintf("%s/%s/manifests/%s/%s", proto, proto_version, repo, tag)
 }
 
 // TODO we need to get user in ctx, or setting in config

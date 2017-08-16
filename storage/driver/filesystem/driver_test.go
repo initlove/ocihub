@@ -18,7 +18,7 @@ func TestPut(t *testing.T) {
 
 	var ctx context.Context
 	var d driver
-	d.Create(paras)
+	d.Init(paras)
 
 	testPath := "testPath"
 	testData := []byte("testdata")

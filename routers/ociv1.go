@@ -31,7 +31,7 @@ func OCIV1NameSpace() *beego.Namespace {
 			ctx.Output.Body([]byte("ok"))
 		}),
 		beego.NSRouter("/*/tags/list", &controllers.OCIV1Tag{}, "get:GetTagsList"),
-		beego.NSRouter("/*/blobs/upload/?:uuid", &controllers.OCIV1Blob{}, "post:PostBlob;patch:PatchBlob;put:PutBlob"),
+		beego.NSRouter("/*/blobs/uploads/?:uuid", &controllers.OCIV1Blob{}, "post:PostBlob;patch:PatchBlob;put:PutBlob"),
 		beego.NSRouter("/*/blobs/:digest", &controllers.OCIV1Blob{}, "head:HeadBlob;get:GetBlob;delete:DeleteBlob"),
 		beego.NSRouter("/*/manifest/:tags", &controllers.OCIV1Manifest{}, "get:GetManifest;put:PutManifest;delete:DeleteManifest"),
 	)
