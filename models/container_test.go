@@ -16,7 +16,7 @@ func TestQueryTagsList(t *testing.T) {
 		proto         string
 		proto_version string
 		output        []string
-		err           bool
+		expected      bool
 	}{
 		{"notexist", "oci", "v1", nil, true},
 		{"second/second", "oci", "v1", []string{"v0.1", "v0.2"}, true},
@@ -27,6 +27,61 @@ func TestQueryTagsList(t *testing.T) {
 	for _, c := range cases {
 		tags, err := QueryTagsList(c.reponame, c.proto, c.proto_version)
 		assert.Equal(t, c.output, tags)
-		assert.Equal(t, c.err, err == nil)
+		assert.Equal(t, c.expected, err == nil)
+	}
+}
+
+func TestQueryReposList(t *testing.T) {
+	if !testReady {
+		return
+	}
+	// init the testdata
+	FreeTestDBData()
+	InitTestDBData()
+
+	testdata := []string{"first", "second/second", "third/third", "fourth/fourth/fourth"}
+
+	repos, err := QueryReposList()
+	assert.Equal(t, testdata, repos)
+	assert.Nil(t, err)
+}
+
+func TestAddRepo(t *testing.T) {
+	if !testReady {
+		return
+	}
+
+	cases := []struct {
+		reponame string
+		expected bool
+	}{
+		{"TestAddRepo-A", true},
+		// exist
+		{"TestAddRepo-A", true},
+	}
+	for _, c := range cases {
+		_, err := AddRepo(c.reponame)
+		assert.Equal(t, c.expected, err == nil)
+	}
+}
+
+func TestAddImage(t *testing.T) {
+	if !testReady {
+		return
+	}
+
+	cases := []struct {
+		reponame      string
+		tag           string
+		proto         string
+		proto_version string
+		expected      bool
+	}{
+		{"TestAddImage-A", "0.1", "test", "vtest", true},
+		{"TestAddImage-A", "0.1", "test", "vtest", true},
+	}
+	for _, c := range cases {
+		_, err := AddImage(c.reponame, c.tag, c.proto, c.proto_version)
+		assert.Equal(t, c.expected, err == nil)
 	}
 }

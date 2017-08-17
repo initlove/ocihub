@@ -1,36 +1,19 @@
 package storage
 
 import (
-	"crypto/sha256"
 	"fmt"
 
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/logs"
 
 	"github.com/initlove/ocihub/storage/driver"
+	"github.com/initlove/ocihub/utils"
 )
-
-// TODO: lots of todo, need to verify the digest
-func snap(digest string) string {
-	if len(digest) < 2 {
-		panic("Invalid digest")
-	}
-
-	return digest[:2]
-}
-
-func getDigest(alg string, data []byte) string {
-	if alg == "sha256" {
-		sum := sha256.Sum256(data)
-		return fmt.Sprintf("%x", sum)
-	}
-
-	return ""
-}
 
 // repo is not used
 func ComposeBlobPath(repo string, digest string, proto string, proto_version string) string {
-	return fmt.Sprintf("%s/%s/blobs/%s/%s", proto, proto_version, snap(digest), digest)
+	head, real := utils.Snap(digest)
+	return fmt.Sprintf("%s/%s/blobs/%s/%s", proto, proto_version, head, real)
 }
 
 // TODO we need to get user in ctx, or setting in config
@@ -51,7 +34,7 @@ func GetBlob(ctx *context.Context, repo string, digest string, proto string, pro
 
 // TODO we need to get user in ctx, or setting in config
 func PutBlob(ctx *context.Context, repo string, proto string, proto_version string, data []byte) error {
-	digest := getDigest("sha256", data)
+	digest := utils.GetDigest("sha256", data)
 	storagePath := ComposeBlobPath(repo, digest, proto, proto_version)
 	logs.Debug("Put '%s'.", storagePath)
 

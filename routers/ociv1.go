@@ -29,9 +29,7 @@ func OCIV1NameSpace() *beego.Namespace {
 		beego.NSGet("/", func(ctx *context.Context) {
 			ctx.Output.Body([]byte("ok"))
 		}),
-		beego.NSGet("/*/tags", func(ctx *context.Context) {
-			logs.Debug(ctx.Input.Param(":splat"))
-			logs.Debug(ctx.Input.Param(":version"))
+		beego.NSGet("/_catalog", func(ctx *context.Context) {
 			ctx.Output.Body([]byte("ok"))
 		}),
 		beego.NSRouter("/*/tags/list", &controllers.OCIV1Tag{}, "get:GetTagsList"),
