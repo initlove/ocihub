@@ -16,6 +16,10 @@ type SessionDriver interface {
 	New(ctx context.Context) (string, error)
 	Get(ctx context.Context, id string) (interface{}, error)
 	Release(ctx context.Context, id string) error
+
+	// Should merge to 'Get' and add 'name' paras
+	GetCache(ctx context.Context, id string) ([]byte, error)
+	PutCache(ctx context.Context, id string, data []byte) error
 	GC() error
 }
 
@@ -51,7 +55,11 @@ func InitSession(cfg config.SessionConfig) error {
 	for n, v := range cfg {
 		if d, ok := sds[n]; ok {
 			logs.Debug("Init Session Driver: '%s'.", n)
-			return d.Init(v)
+			err := d.Init(v)
+			if err == nil {
+				sysSession = d
+			}
+			return err
 		}
 	}
 
@@ -80,6 +88,26 @@ func Release(ctx context.Context, id string) error {
 	}
 
 	return sysSession.Release(ctx, id)
+}
+
+func GetCache(ctx context.Context, id string) ([]byte, error) {
+	if sysSession == nil {
+		return nil, errors.New("Please init the session driver first.")
+	}
+
+	// FIXME: id should not be printed after service online
+	logs.Debug("Session GetCache '%s'.", id)
+	return sysSession.GetCache(ctx, id)
+}
+
+func PutCache(ctx context.Context, id string, data []byte) error {
+	if sysSession == nil {
+		return errors.New("Please init the session driver first.")
+	}
+
+	// FIXME: id should not be printed after service online
+	logs.Debug("Session PutCache '%s'.", id)
+	return sysSession.PutCache(ctx, id, data)
 }
 
 func GC() error {

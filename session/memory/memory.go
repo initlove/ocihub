@@ -16,10 +16,12 @@ const (
 
 type Memory struct {
 	store map[string]session.Record
+	cache map[string][]byte
 }
 
 func (m *Memory) Init(paras map[string]interface{}) error {
 	m.store = make(map[string]session.Record)
+	m.cache = make(map[string][]byte)
 	return nil
 }
 
@@ -63,7 +65,29 @@ func (m *Memory) Release(ctx context.Context, id string) error {
 	}
 
 	delete(m.store, id)
+	delete(m.cache, id)
+	return nil
+}
 
+//TODO: id should be same with session id
+func (m *Memory) GetCache(ctx context.Context, id string) ([]byte, error) {
+	if m.cache == nil {
+		return nil, errors.New("Please init the 'session memory' driver before use it.")
+	}
+
+	data, ok := m.cache[id]
+	if !ok {
+		return nil, errors.New("Cannot get the matched cache data.")
+	}
+	return data, nil
+}
+
+func (m *Memory) PutCache(ctx context.Context, id string, data []byte) error {
+	if m.cache == nil {
+		return errors.New("Please init the 'session memory' driver before use it.")
+	}
+
+	m.cache[id] = data
 	return nil
 }
 

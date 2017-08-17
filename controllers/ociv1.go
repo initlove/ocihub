@@ -147,6 +147,7 @@ func (this *OCIV1Blob) PostBlob() {
 	id, err := session.New(*this.Ctx)
 	if err != nil {
 		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to create session to upload blob to '%s'.", reponame))
+		return
 	}
 
 	header := make(map[string]string)
@@ -155,8 +156,69 @@ func (this *OCIV1Blob) PostBlob() {
 	CTX_SUCCESS_WRAP(this.Ctx, http.StatusAccepted, "ok", header)
 }
 
+// real start to push
 func (this *OCIV1Blob) PatchBlob() {
+	reponame := this.Ctx.Input.Param(":splat")
+	uuid := this.Ctx.Input.Param(":uuid")
+	// FIXME: Warn: for security reason, we should not output the uuid
+	logs.Debug("PatchBlob of '%s:%s'.", reponame, uuid)
+
+	_, err := session.Get(*this.Ctx, uuid)
+	if err != nil {
+		// TODO: not found error
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to get session in patching blob to '%s'.", reponame))
+		return
+	}
+
+	// FIXME, f, h , err
+	f, _, err := this.GetFile("filename")
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusBadRequest, err, fmt.Sprintf("Cannot find the blob data to '%s'.", reponame))
+		return
+	}
+
+	// TODO: just use Writer and io.Copy to that
+	data, _ := ioutil.ReadAll(f)
+	f.Close()
+	err = session.PutCache(*this.Ctx, uuid, data)
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to cache the patched blob to '%s'.", reponame))
+		return
+	}
+	CTX_SUCCESS_WRAP(this.Ctx, http.StatusOK, fmt.Sprintf("Succeed in patch blob to '%s'.", reponame), nil)
 }
 
+// Complete the blob
 func (this *OCIV1Blob) PutBlob() {
+	reponame := this.Ctx.Input.Param(":splat")
+	uuid := this.Ctx.Input.Param(":uuid")
+	// FIXME: Warn: for security reason, we should not output the uuid
+	logs.Debug("PutBlob of '%s:%s'.", reponame, uuid)
+
+	_, err := session.Get(*this.Ctx, uuid)
+	if err != nil {
+		// TODO: not found error
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to get session in putting blob to '%s'.", reponame))
+		return
+	}
+
+	data, err := session.GetCache(*this.Ctx, uuid)
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to get cached session data in putting blob to '%s'.", reponame))
+		return
+	}
+
+	err = storage.PutBlob(this.Ctx, reponame, "oci", "v1", data)
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to put blob of '%s'.", reponame))
+		return
+	}
+
+	err = session.Release(*this.Ctx, uuid)
+	if err != nil {
+		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to release session in putting blob to '%s'.", reponame))
+		return
+	}
+
+	CTX_SUCCESS_WRAP(this.Ctx, http.StatusOK, fmt.Sprintf("Succeed in putting blob of '%s'.", reponame), nil)
 }
