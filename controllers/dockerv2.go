@@ -67,6 +67,7 @@ func (this *DockerV2Manifest) GetManifest() {
 
 	digest, _ := utils.DigestManifest(data)
 	header := make(map[string]string)
+	header["Content-Type"] = "application/vnd.docker.distribution.manifest.v2+json"
 	header["Docker-Content-Digest"] = digest
 	header["Content-Length"] = fmt.Sprint(len(data))
 	CTX_DATA_WRAP(this.Ctx, http.StatusOK, data, header)
@@ -78,7 +79,7 @@ func (this *DockerV2Manifest) PutManifest() {
 	logs.Debug("PutManifest of '%s:%s'.", reponame, tags)
 
 	data := this.Ctx.Input.CopyBody(utils.MaxSize)
-	logs.Debug("Ma <%s>", data)
+	logs.Debug("The manifest is <%s>", data)
 	err := storage.PutManifest(this.Ctx, reponame, tags, "docker", "v2", data)
 	if err != nil {
 		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to put manifest of '%s:%s'.", reponame, tags))
