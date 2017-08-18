@@ -13,7 +13,7 @@ func TestMemory(t *testing.T) {
 	testData := []byte("test data")
 
 	// Not inited
-	_, err := m.New(ctx)
+	_, err := m.New(ctx, "")
 	assert.NotNil(t, err)
 	_, err = m.Get(ctx, "")
 	assert.NotNil(t, err)
@@ -30,7 +30,7 @@ func TestMemory(t *testing.T) {
 	err = m.Init(nil)
 	assert.Nil(t, err)
 
-	id, err := m.New(ctx)
+	id, err := m.New(ctx, "")
 	assert.Nil(t, err)
 
 	_, err = m.Get(ctx, id)

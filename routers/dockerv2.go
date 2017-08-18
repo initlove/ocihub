@@ -23,12 +23,9 @@ func init() {
 func DockerV2NameSpace() *beego.Namespace {
 	ns := beego.NewNamespace(dockerV2Prefix,
 		beego.NSCond(func(ctx *context.Context) bool {
-			logs.Debug("We get dockerv2")
 			return true
 		}),
-		beego.NSGet("/", func(ctx *context.Context) {
-			ctx.Output.Body([]byte("ok"))
-		}),
+		beego.NSRouter("/", &controllers.DockerV2Ping{}, "get:Ping"),
 		beego.NSRouter("/_catalog", &controllers.DockerV2Repo{}, "get:GetRepoList"),
 		beego.NSRouter("/*/tags/list", &controllers.DockerV2Tag{}, "get:GetTagsList"),
 		//FIXME: delete the upload blob/ get the upload blob/

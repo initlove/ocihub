@@ -13,7 +13,7 @@ import (
 
 type SessionDriver interface {
 	Init(paras map[string]interface{}) error
-	New(ctx context.Context) (string, error)
+	New(ctx context.Context, id string) (string, error)
 	Get(ctx context.Context, id string) (interface{}, error)
 	Release(ctx context.Context, id string) error
 
@@ -66,12 +66,12 @@ func InitSession(cfg config.SessionConfig) error {
 	return errors.New("Cannot find supported session driver.")
 }
 
-func New(ctx context.Context) (string, error) {
+func New(ctx context.Context, id string) (string, error) {
 	if sysSession == nil {
 		return "", errors.New("Please init the session driver first.")
 	}
 
-	return sysSession.New(ctx)
+	return sysSession.New(ctx, id)
 }
 
 func Get(ctx context.Context, id string) (interface{}, error) {

@@ -25,14 +25,19 @@ func (m *Memory) Init(paras map[string]interface{}) error {
 	return nil
 }
 
-func (m *Memory) New(ctx context.Context) (string, error) {
+func (m *Memory) New(ctx context.Context, id string) (string, error) {
 	if m.store == nil {
 		return "", errors.New("Please init the 'session memory' driver before use it.")
 	}
 
+	if id != "" {
+		//FIXME: check id
+		m.store[id] = session.NewRecordFromContext(ctx)
+		return id, nil
+	}
+
 	sessionUUID := uuid.NewV4().String()
 	m.store[sessionUUID] = session.NewRecordFromContext(ctx)
-
 	return sessionUUID, nil
 }
 

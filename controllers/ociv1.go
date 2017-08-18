@@ -144,7 +144,7 @@ func (this *OCIV1Blob) PostBlob() {
 	reponame := this.Ctx.Input.Param(":splat")
 	logs.Debug("PostBlob of '%s'.", reponame)
 
-	id, err := session.New(*this.Ctx)
+	id, err := session.New(*this.Ctx, "")
 	if err != nil {
 		CTX_ERROR_WRAP(this.Ctx, http.StatusInternalServerError, err, fmt.Sprintf("Failed to create session to upload blob to '%s'.", reponame))
 		return
