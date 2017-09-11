@@ -11,15 +11,23 @@ import (
 	"github.com/initlove/ocihub/config"
 )
 
+// SessionDriver provides the session interfaces
 type SessionDriver interface {
+	// Init setups a driver
 	Init(paras map[string]interface{}) error
+	// New creates a new session and gets the id string
 	New(ctx context.Context, id string) (string, error)
+	// Get returns a session by its id
 	Get(ctx context.Context, id string) (interface{}, error)
+	// Release frees the resource of a session by its id and removes the id
 	Release(ctx context.Context, id string) error
 
 	// Should merge to 'Get' and add 'name' paras
+	// GetCache gets the session data by its id
 	GetCache(ctx context.Context, id string) ([]byte, error)
+	// PutCache puts the session data by its id
 	PutCache(ctx context.Context, id string, data []byte) error
+	// GC starts to garbage collection
 	GC() error
 }
 
@@ -30,6 +38,7 @@ var (
 	sysSession SessionDriver = nil
 )
 
+// Register regists a driver
 func Register(name string, driver SessionDriver) error {
 	if name == "" {
 		return errors.New("Could not register a session driver with empty name.")
@@ -51,6 +60,7 @@ func Register(name string, driver SessionDriver) error {
 	return nil
 }
 
+// InitSession inits the session defined in the config file
 func InitSession(cfg config.SessionConfig) error {
 	for n, v := range cfg {
 		if d, ok := sds[n]; ok {
@@ -66,6 +76,7 @@ func InitSession(cfg config.SessionConfig) error {
 	return errors.New("Cannot find supported session driver.")
 }
 
+// New creates a new session and gets the id string
 func New(ctx context.Context, id string) (string, error) {
 	if sysSession == nil {
 		return "", errors.New("Please init the session driver first.")
@@ -74,6 +85,7 @@ func New(ctx context.Context, id string) (string, error) {
 	return sysSession.New(ctx, id)
 }
 
+// Get returns a session by its id
 func Get(ctx context.Context, id string) (interface{}, error) {
 	if sysSession == nil {
 		return nil, errors.New("Please init the session driver first.")
@@ -82,6 +94,7 @@ func Get(ctx context.Context, id string) (interface{}, error) {
 	return sysSession.Get(ctx, id)
 }
 
+// Release frees the resource of a session by its id and removes the id
 func Release(ctx context.Context, id string) error {
 	if sysSession == nil {
 		return errors.New("Please init the session driver first.")
@@ -90,6 +103,7 @@ func Release(ctx context.Context, id string) error {
 	return sysSession.Release(ctx, id)
 }
 
+// GetCache gets the session data by its id
 func GetCache(ctx context.Context, id string) ([]byte, error) {
 	if sysSession == nil {
 		return nil, errors.New("Please init the session driver first.")
@@ -100,6 +114,7 @@ func GetCache(ctx context.Context, id string) ([]byte, error) {
 	return sysSession.GetCache(ctx, id)
 }
 
+// PutCache puts the session data by its id
 func PutCache(ctx context.Context, id string, data []byte) error {
 	if sysSession == nil {
 		return errors.New("Please init the session driver first.")
@@ -110,6 +125,7 @@ func PutCache(ctx context.Context, id string, data []byte) error {
 	return sysSession.PutCache(ctx, id, data)
 }
 
+// GC starts to garbage collection
 func GC() error {
 	if sysSession == nil {
 		return errors.New("Please init the session driver first.")

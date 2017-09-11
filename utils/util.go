@@ -6,12 +6,14 @@ import (
 	"strings"
 )
 
+// MaxSize defines the max supported file size
 var MaxSize int64
 
 func init() {
 	MaxSize = 1024 * 1024 * 1024
 }
 
+// Snap gets the digest value of a full digest string
 // TODO: lots of todo, need to verify the digest
 func Snap(digestFull string) (string, string) {
 	var digest string
@@ -29,6 +31,7 @@ func Snap(digestFull string) (string, string) {
 	return digest[:2], digest
 }
 
+// GetDigest gets the digest value from an algrithm and a data value
 func GetDigest(alg string, data []byte) string {
 	if alg == "sha256" {
 		sum := sha256.Sum256(data)

@@ -57,6 +57,7 @@ func (a Algorithm) Available() bool {
 	return h.Available()
 }
 
+// New creates a new digester
 func (a Algorithm) New() Digester {
 	return &digester{
 		alg:  a,
@@ -64,6 +65,7 @@ func (a Algorithm) New() Digester {
 	}
 }
 
+// Hash gets the hash of an algorithm
 func (a Algorithm) Hash() hash.Hash {
 	if !a.Available() {
 		return nil
@@ -72,6 +74,7 @@ func (a Algorithm) Hash() hash.Hash {
 	return algorithms[a].New()
 }
 
+// Digester defines a Hash and Digest operation
 type Digester interface {
 	Hash() hash.Hash // provides direct access to underlying hash instance.
 	Digest() string
@@ -91,6 +94,7 @@ func (d *digester) Digest() string {
 	return string(fmt.Sprintf("%s:%x", d.alg, d.hash.Sum(nil)))
 }
 
+// FromReader gets the digest from an io.Reader
 func FromReader(rd io.Reader) (string, error) {
 	digester := Canonical.New()
 
@@ -101,6 +105,7 @@ func FromReader(rd io.Reader) (string, error) {
 	return digester.Digest(), nil
 }
 
+// Payload gets the playload of a docker manifest file
 func Payload(data []byte) ([]byte, error) {
 	jsig, err := libtrust.ParsePrettySignature(data, "signatures")
 	if err != nil {
@@ -111,6 +116,7 @@ func Payload(data []byte) ([]byte, error) {
 	return jsig.Payload()
 }
 
+// DigestManifest gets the real digest content of a docker manifest
 func DigestManifest(data []byte) (string, error) {
 	p, err := Payload(data)
 	if err != nil {

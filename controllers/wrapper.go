@@ -9,7 +9,8 @@ import (
 
 //TODO: more logs info
 
-func CTX_ERROR_WRAP(ctx *context.Context, code int, err error, msg string) {
+// CtxErrorWrap wraps the error http message
+func CtxErrorWrap(ctx *context.Context, code int, err error, msg string) {
 	ctx.Output.SetStatus(code)
 	ctx.Output.Body([]byte(msg))
 
@@ -20,7 +21,8 @@ func CTX_ERROR_WRAP(ctx *context.Context, code int, err error, msg string) {
 	}
 }
 
-func CTX_SUCCESS_WRAP(ctx *context.Context, code int, result interface{}, header map[string]string) {
+// CtxSuccessWrap wraps the success http message
+func CtxSuccessWrap(ctx *context.Context, code int, result interface{}, header map[string]string) {
 	ctx.Output.SetStatus(code)
 	for n, v := range header {
 		ctx.Output.Header(n, v)
@@ -31,7 +33,8 @@ func CTX_SUCCESS_WRAP(ctx *context.Context, code int, result interface{}, header
 	logs.Trace("Succeed in [%s] [%s].", ctx.Input.Method(), ctx.Input.URI())
 }
 
-func CTX_DATA_WRAP(ctx *context.Context, code int, result []byte, header map[string]string) {
+// CtxDataWrap wraps the http data steam
+func CtxDataWrap(ctx *context.Context, code int, result []byte, header map[string]string) {
 	ctx.Output.SetStatus(code)
 	for n, v := range header {
 		ctx.Output.Header(n, v)
