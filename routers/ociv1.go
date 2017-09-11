@@ -20,6 +20,7 @@ func init() {
 	}
 }
 
+// OCIV1NameSpace defines the oci v1 router
 func OCIV1NameSpace() *beego.Namespace {
 	ns := beego.NewNamespace(ociV1Prefix,
 		beego.NSCond(func(ctx *context.Context) bool {

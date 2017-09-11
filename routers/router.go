@@ -13,6 +13,7 @@ var (
 	nss     = make(map[string]*beego.Namespace, 8)
 )
 
+// RegisterRouter regists a router by its name and its namespace
 func RegisterRouter(name string, ns *beego.Namespace) error {
 	if name == "" {
 		return errors.New("Cannot register a namespace without a name")
@@ -33,6 +34,7 @@ func RegisterRouter(name string, ns *beego.Namespace) error {
 	return nil
 }
 
+// GetNamespaces gets the namespaces of a router
 func GetNamespaces() map[string]*beego.Namespace {
 	return nss
 }

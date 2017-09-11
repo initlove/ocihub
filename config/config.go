@@ -9,28 +9,43 @@ import (
 )
 
 var (
-	EMPTY_DB_USER_OR_PASSWD = errors.New("The database 'User' or 'Password' should not be empty.")
-	EMPTY_DB_NAME           = errors.New("The database 'Name' should not be empty.")
-	EMPTY_DB_SERVER         = errors.New("The database 'Server' should not be empty.")
+	// TODO: makes error better name.
 
-	NON_STORAGE_BACKEND = errors.New("At least one storage backend required.")
-	NON_SESSION_BACKEND = errors.New("At least one session backend required.")
+	// EmptyDbUserOrPassword represents the 'user' or 'password' empty error
+	EmptyDbUserOrPassword = errors.New("database 'User' or 'Password' should not be empty")
+	// EmptyDbName represents the 'name' empty error
+	EmptyDbName = errors.New("database 'Name' should not be empty")
+	// EmptyDbServer represents the 'database server' empty error
+	EmptyDbServer = errors.New("database 'Server' should not be empty")
+
+	// NonStorageBackend represents the 'storage backend' empty error
+	NonStorageBackend = errors.New("at least one storage backend required")
+	// NonSessionBackend represents the 'session backend' empty error
+	NonSessionBackend = errors.New("at least one session backend required")
 )
 
+// Config defines the config items
 type Config struct {
+	// Port is the server listen port
 	Port int64 `yaml:"port"`
+	// Log defines the log config group
 	// The log validation will be checked in the log init part.
 	Log LogConfig `yaml:"log,omitempty"`
+	// StorageLoad
 	// 'dynamic' or 'static'
 	// static: load at the first time
 	// dynamic: load every time, most time because of multiple tenant using their own token/ak-sk
 	// TODO: should have 'default' value
-	StorageLoad string        `yaml:"storageload,omitempty"`
-	Storage     StorageConfig `yaml:"storage"`
-	DB          DBConfig      `yaml:"db"`
-	Session     SessionConfig `yaml:"session"`
+	StorageLoad string `yaml:"storageload,omitempty"`
+	// Storage defines the storage config group
+	Storage StorageConfig `yaml:"storage"`
+	// DB defines the db config group
+	DB DBConfig `yaml:"db"`
+	// Session defines the session config group
+	Session SessionConfig `yaml:"session"`
 }
 
+// Valid checks if a config is logical
 func (cfg *Config) Valid() error {
 	if err := cfg.Storage.Valid(); err != nil {
 		return err
@@ -45,28 +60,34 @@ func (cfg *Config) Valid() error {
 	return nil
 }
 
+// LogConfig stores the log config item group
 type LogConfig map[string](map[string]interface{})
 
+// StorageConfig stores the storage config item group
 type StorageConfig map[string](map[string]interface{})
 
+// Valid checks the storage config validation
 func (cfg *StorageConfig) Valid() error {
 	if len(*cfg) == 0 {
-		return NON_STORAGE_BACKEND
+		return NonStorageBackend
 	}
 
 	return nil
 }
 
+// SessionConfig stores the session config item group
 type SessionConfig map[string](map[string]interface{})
 
+// Valid checks the session config validation
 func (cfg *SessionConfig) Valid() error {
 	if len(*cfg) == 0 {
-		return NON_SESSION_BACKEND
+		return NonSessionBackend
 	}
 
 	return nil
 }
 
+// DBConfig defines the db configs
 type DBConfig struct {
 	Driver   string `yaml:"driver"`
 	User     string `yaml:"user"`
@@ -75,21 +96,23 @@ type DBConfig struct {
 	Name     string `yaml:"name"`
 }
 
+// GetConnection returns the sql recognizable connection string
 func (cfg *DBConfig) GetConnection() (string, error) {
 	if cfg.User == "" || cfg.Password == "" {
-		return "", EMPTY_DB_USER_OR_PASSWD
+		return "", EmptyDbUserOrPassword
 	}
 
 	if cfg.Name == "" {
-		return "", EMPTY_DB_NAME
+		return "", EmptyDbName
 	}
 	if cfg.Server == "" {
-		return "", EMPTY_DB_SERVER
+		return "", EmptyDbServer
 	}
 
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", cfg.User, cfg.Password, cfg.Server, cfg.Name), nil
 }
 
+// Valid checks the db config validation
 func (cfg *DBConfig) Valid() error {
 	_, err := cfg.GetConnection()
 	if err != nil {
@@ -103,6 +126,7 @@ var (
 	sysConfig Config
 )
 
+// InitConfigFromFile loads the config from a file
 func InitConfigFromFile(path string) (Config, error) {
 	var config Config
 	data, err := ioutil.ReadFile(path)
@@ -120,6 +144,7 @@ func InitConfigFromFile(path string) (Config, error) {
 	return config, nil
 }
 
+// GetConfig returns the current system config setting
 func GetConfig() Config {
 	return sysConfig
 }
