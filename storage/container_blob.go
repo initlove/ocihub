@@ -10,12 +10,14 @@ import (
 	"github.com/initlove/ocihub/utils"
 )
 
+// ComposeBlobPath composes the blob path from the 'digest, proto, proto version'
 // repo is not used
 func ComposeBlobPath(repo string, digest string, proto string, proto_version string) string {
 	head, real := utils.Snap(digest)
 	return fmt.Sprintf("%s/%s/blobs/%s/%s", proto, proto_version, head, real)
 }
 
+// HeadBlob return the blob stat
 // TODO we need to get user in ctx, or setting in config
 func HeadBlob(ctx *context.Context, repo string, digest string, proto string, proto_version string) (driver.FileInfo, error) {
 	storagePath := ComposeBlobPath(repo, digest, proto, proto_version)
@@ -24,6 +26,7 @@ func HeadBlob(ctx *context.Context, repo string, digest string, proto string, pr
 	return Driver().Stat(*ctx, storagePath)
 }
 
+// GetBlob gets the blob data
 // TODO we need to get user in ctx, or setting in config
 func GetBlob(ctx *context.Context, repo string, digest string, proto string, proto_version string) ([]byte, error) {
 	storagePath := ComposeBlobPath(repo, digest, proto, proto_version)
@@ -32,6 +35,7 @@ func GetBlob(ctx *context.Context, repo string, digest string, proto string, pro
 	return Driver().GetContent(*ctx, storagePath)
 }
 
+// PutBlob puts the blob
 // TODO we need to get user in ctx, or setting in config
 func PutBlob(ctx *context.Context, repo string, proto string, proto_version string, data []byte) error {
 	digest := utils.GetDigest("sha256", data)
@@ -41,6 +45,7 @@ func PutBlob(ctx *context.Context, repo string, proto string, proto_version stri
 	return Driver().PutContent(*ctx, storagePath, data)
 }
 
+// DeleteBlob deletes the blob
 // TODO we need to get user in ctx, or setting in config
 func DeleteBlob(ctx *context.Context, repo string, digest string, proto string, proto_version string) error {
 	storagePath := ComposeBlobPath(repo, digest, proto, proto_version)
