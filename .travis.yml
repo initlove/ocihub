@@ -1,3 +1,5 @@
+services:
+  - mysql
 language: go
 go:
   - 1.7
@@ -11,10 +13,13 @@ before_install:
 
 install: true
 
+env:
+  - TESTCONN=testuser:testpass@tcp(localhost:3306)/testdb?charset=utf8
 script:
   - git-validation -run DCO,short-subject -v -range ${TRAVIS_COMMIT_RANGE}
   - make
   - make test
+  - ./mysql.sh
   - ./coverage.sh
 
 after_success:
