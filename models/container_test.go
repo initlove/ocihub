@@ -100,7 +100,7 @@ func TestQueryImage(t *testing.T) {
 	InitTestDBData()
 
 	cases := []struct {
-		repo_id      int
+		repoID       int
 		tag          string
 		proto        string
 		protoVersion string
@@ -111,7 +111,7 @@ func TestQueryImage(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		img, err := QueryImage(c.repo_id, c.tag, c.proto, c.protoVersion)
+		img, err := QueryImage(c.repoID, c.tag, c.proto, c.protoVersion)
 		assert.Nil(t, err)
 		assert.Equal(t, c.expected, img != nil)
 	}
