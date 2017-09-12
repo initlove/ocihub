@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/astaxie/beego/context"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,6 +33,16 @@ func TestMemory(t *testing.T) {
 
 	id, err := m.New(ctx, "")
 	assert.Nil(t, err)
+
+	// id is already exists
+	_, err = m.New(ctx, id)
+	assert.NotNil(t, err)
+
+	// id is new
+	wantedID := uuid.NewV4().String()
+	id, err = m.New(ctx, wantedID)
+	assert.Nil(t, err)
+	assert.Equal(t, wantedID, id)
 
 	_, err = m.Get(ctx, id)
 	assert.Nil(t, err)

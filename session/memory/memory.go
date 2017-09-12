@@ -34,7 +34,9 @@ func (m *Memory) New(ctx context.Context, id string) (string, error) {
 	}
 
 	if id != "" {
-		//FIXME: check id
+		if _, ok := m.store[id]; ok {
+			return "", errors.New("id is already in used")
+		}
 		m.store[id] = session.NewRecordFromContext(ctx)
 		return id, nil
 	}
