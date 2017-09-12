@@ -25,7 +25,7 @@ func (d *MockDriver) Valid(parameters map[string]interface{}) error {
 		}
 	}
 
-	return errors.New("Missing 'name' data.")
+	return errors.New("missing 'name' data")
 }
 
 // Implement the storagedriver.StorageDriver interface

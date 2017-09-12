@@ -48,7 +48,7 @@ func (d *driver) Init(parameters map[string]interface{}) error {
 		}
 	}
 
-	return errors.New("Missing 'rootDirectory' data.")
+	return errors.New("missing 'rootDirectory' data")
 }
 
 func (d *driver) Valid(parameters map[string]interface{}) error {
@@ -59,7 +59,7 @@ func (d *driver) Valid(parameters map[string]interface{}) error {
 		}
 	}
 
-	return errors.New("Missing 'rootDirectory' data.")
+	return errors.New("missing 'rootDirectory' data")
 }
 
 // Implement the storagedriver.StorageDriver interface

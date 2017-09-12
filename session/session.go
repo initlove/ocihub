@@ -45,18 +45,18 @@ func init() {
 // Register regists a driver
 func Register(name string, driver Driver) error {
 	if name == "" {
-		return errors.New("Could not register a session driver with empty name.")
+		return errors.New("could not register a session driver with empty name")
 	}
 
 	if driver == nil {
-		return errors.New("Could not register a nil session driver.")
+		return errors.New("could not register a nil session driver")
 	}
 
 	sdLock.Lock()
 	defer sdLock.Unlock()
 
 	if _, exists := sds[name]; exists {
-		return fmt.Errorf("Driver '%s' is already registered.", name)
+		return fmt.Errorf("driver '%s' is already registered", name)
 	}
 
 	sds[name] = driver
@@ -77,13 +77,13 @@ func InitSession(cfg config.SessionConfig) error {
 		}
 	}
 
-	return errors.New("Cannot find supported session driver.")
+	return errors.New("cannot find supported session driver")
 }
 
 // New creates a new session and gets the id string
 func New(ctx context.Context, id string) (string, error) {
 	if sysSession == nil {
-		return "", errors.New("Please init the session driver first.")
+		return "", errors.New("please init the session driver first")
 	}
 
 	return sysSession.New(ctx, id)
@@ -92,7 +92,7 @@ func New(ctx context.Context, id string) (string, error) {
 // Get returns a session by its id
 func Get(ctx context.Context, id string) (interface{}, error) {
 	if sysSession == nil {
-		return nil, errors.New("Please init the session driver first.")
+		return nil, errors.New("please init the session driver first")
 	}
 
 	return sysSession.Get(ctx, id)
@@ -101,7 +101,7 @@ func Get(ctx context.Context, id string) (interface{}, error) {
 // Release frees the resource of a session by its id and removes the id
 func Release(ctx context.Context, id string) error {
 	if sysSession == nil {
-		return errors.New("Please init the session driver first.")
+		return errors.New("please init the session driver first")
 	}
 
 	return sysSession.Release(ctx, id)
@@ -110,7 +110,7 @@ func Release(ctx context.Context, id string) error {
 // GetCache gets the session data by its id
 func GetCache(ctx context.Context, id string) ([]byte, error) {
 	if sysSession == nil {
-		return nil, errors.New("Please init the session driver first.")
+		return nil, errors.New("please init the session driver first")
 	}
 
 	// FIXME: id should not be printed after service online
@@ -121,7 +121,7 @@ func GetCache(ctx context.Context, id string) ([]byte, error) {
 // PutCache puts the session data by its id
 func PutCache(ctx context.Context, id string, data []byte) error {
 	if sysSession == nil {
-		return errors.New("Please init the session driver first.")
+		return errors.New("please init the session driver first")
 	}
 
 	// FIXME: id should not be printed after service online
@@ -132,7 +132,7 @@ func PutCache(ctx context.Context, id string, data []byte) error {
 // GC starts to garbage collection
 func GC() error {
 	if sysSession == nil {
-		return errors.New("Please init the session driver first.")
+		return errors.New("please init the session driver first")
 	}
 
 	return sysSession.GC()
