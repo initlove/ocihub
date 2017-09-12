@@ -83,6 +83,24 @@ func (d *MockDriver) URLFor(ctx context.Context, path string, options map[string
 	return "", nil
 }
 
+func TestErrors(t *testing.T) {
+	var eum ErrUnsupportedMethod
+	t.Log(eum.Error())
+
+	var pnfe PathNotFoundError
+	t.Log(pnfe.Error())
+
+	var ipe InvalidPathError
+	t.Log(ipe.Error())
+
+	var ioe InvalidOffsetError
+	t.Log(ioe.Error())
+
+	var e Error
+	t.Log(e.Error())
+
+}
+
 func TestRegister(t *testing.T) {
 	cases := []struct {
 		name     string
