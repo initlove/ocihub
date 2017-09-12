@@ -25,7 +25,8 @@ func Snap(digestFull string) (string, string) {
 	}
 
 	if len(digest) < 2 {
-		panic("Invalid digest")
+		//	panic("Invalid digest")
+		return "", ""
 	}
 
 	return digest[:2], digest
