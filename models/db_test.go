@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var dbLock sync.Mutex
 var testReady = false
 
 func init() {
@@ -55,22 +57,28 @@ func InitTestDB() error {
 	return errors.New("Cannot connect to the test database")
 }
 
-func InitTestDBData() error {
-	initsql, err := ioutil.ReadFile("testdata/init.sql")
+func RunScript(script string) error {
+	scriptsql, err := ioutil.ReadFile(script)
 	if err != nil {
 		return fmt.Errorf("Failed to init test data: %v", err)
 	}
 
 	// Seems orm can only exec one sql at one time.
-	for _, sql := range strings.SplitAfter(string(initsql), ";") {
+	for _, sql := range strings.SplitAfter(string(scriptsql), ";") {
 		if len(strings.TrimSpace(sql)) == 0 {
 			continue
 		}
-		_, err = orm.NewOrm().Raw(sql).Exec()
+		_, err := orm.NewOrm().Raw(sql).Exec()
 		if err != nil {
-			break
+			return err
 		}
 	}
+
+	return nil
+}
+
+func InitTestDBData() error {
+	err := RunScript("testdata/init.sql")
 	if err != nil {
 		FreeTestDBData()
 		return fmt.Errorf("Failed to exec init sql: %v", err)
@@ -79,19 +87,16 @@ func InitTestDBData() error {
 	return nil
 }
 
-func FreeTestDBData() error {
-	freesql, err := ioutil.ReadFile("testdata/free.sql")
-	if err != nil {
-		return err
-	}
-	for _, sql := range strings.SplitAfter(string(freesql), ";") {
-		if len(strings.TrimSpace(sql)) == 0 {
-			continue
-		}
-		orm.NewOrm().Raw(sql).Exec()
-	}
+func AlterTable() error {
+	return RunScript("testdata/alter_table.sql")
+}
 
-	return nil
+func RecoverTable() error {
+	return RunScript("testdata/recover_table.sql")
+}
+
+func FreeTestDBData() error {
+	return RunScript("testdata/free.sql")
 }
 
 func TestInitDB(t *testing.T) {

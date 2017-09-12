@@ -29,6 +29,13 @@ func TestQueryTagsList(t *testing.T) {
 		assert.Equal(t, c.output, tags)
 		assert.Equal(t, c.expected, err == nil)
 	}
+
+	dbLock.Lock()
+	defer dbLock.Unlock()
+	AlterTable()
+	_, err := QueryTagsList("second/second", "oci", "v1")
+	RecoverTable()
+	assert.NotNil(t, err)
 }
 
 func TestQueryReposList(t *testing.T) {
@@ -44,12 +51,23 @@ func TestQueryReposList(t *testing.T) {
 	repos, err := QueryReposList()
 	assert.Equal(t, testdata, repos)
 	assert.Nil(t, err)
+
+	dbLock.Lock()
+	defer dbLock.Unlock()
+	AlterTable()
+	_, err = QueryReposList()
+	RecoverTable()
+	assert.NotNil(t, err)
 }
 
 func TestAddRepo(t *testing.T) {
 	if !testReady {
 		return
 	}
+
+	// init the testdata
+	FreeTestDBData()
+	InitTestDBData()
 
 	cases := []struct {
 		reponame string
@@ -63,12 +81,57 @@ func TestAddRepo(t *testing.T) {
 		_, err := AddRepo(c.reponame)
 		assert.Equal(t, c.expected, err == nil)
 	}
+
+	dbLock.Lock()
+	defer dbLock.Unlock()
+	AlterTable()
+	_, err := AddRepo("TestAddRepo-B")
+	RecoverTable()
+	assert.NotNil(t, err)
+}
+
+func TestQueryImage(t *testing.T) {
+	if !testReady {
+		return
+	}
+
+	// init the testdata
+	FreeTestDBData()
+	InitTestDBData()
+
+	cases := []struct {
+		repo_id      int
+		tag          string
+		proto        string
+		protoVersion string
+		expected     bool
+	}{
+		{2, "v0.1", "oci", "v1", true},
+		{2, "v10000", "oci", "v1", false},
+	}
+
+	for _, c := range cases {
+		img, err := QueryImage(c.repo_id, c.tag, c.proto, c.protoVersion)
+		assert.Nil(t, err)
+		assert.Equal(t, c.expected, img != nil)
+	}
+
+	dbLock.Lock()
+	defer dbLock.Unlock()
+	AlterTable()
+	_, err := QueryImage(2, "v0.1", "oci", "v1")
+	RecoverTable()
+	assert.NotNil(t, err)
 }
 
 func TestAddImage(t *testing.T) {
 	if !testReady {
 		return
 	}
+
+	// init the testdata
+	FreeTestDBData()
+	InitTestDBData()
 
 	cases := []struct {
 		reponame     string
@@ -84,4 +147,11 @@ func TestAddImage(t *testing.T) {
 		_, err := AddImage(c.reponame, c.tag, c.proto, c.protoVersion)
 		assert.Equal(t, c.expected, err == nil)
 	}
+
+	dbLock.Lock()
+	defer dbLock.Unlock()
+	AlterTable()
+	_, err := AddImage("TestAddImage-B", "0.1", "test", "vtest")
+	RecoverTable()
+	assert.NotNil(t, err)
 }
