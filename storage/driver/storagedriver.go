@@ -146,6 +146,7 @@ var (
 	sds     = make(map[string]StorageDriver, 8)
 )
 
+// Register regists a storage driver to the system driver map
 func Register(name string, driver StorageDriver) error {
 	if name == "" {
 		return errors.New("Could not register a Storage with an empty name")
@@ -165,6 +166,7 @@ func Register(name string, driver StorageDriver) error {
 	return nil
 }
 
+// FindDriver returns the storage driver by its name and parameters
 func FindDriver(name string, params map[string]interface{}) (StorageDriver, error) {
 	if d, ok := sds[name]; ok {
 		err := d.Valid(params)

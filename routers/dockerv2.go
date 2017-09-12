@@ -20,7 +20,7 @@ func init() {
 	}
 }
 
-// DOckerV2Namespace defines the docker v2 router
+// DockerV2NameSpace defines the docker v2 router
 func DockerV2NameSpace() *beego.Namespace {
 	ns := beego.NewNamespace(dockerV2Prefix,
 		beego.NSCond(func(ctx *context.Context) bool {

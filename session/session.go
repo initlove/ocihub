@@ -11,8 +11,8 @@ import (
 	"github.com/initlove/ocihub/config"
 )
 
-// SessionDriver provides the session interfaces
-type SessionDriver interface {
+// Driver provides the session interfaces
+type Driver interface {
 	// Init setups a driver
 	Init(paras map[string]interface{}) error
 	// New creates a new session and gets the id string
@@ -33,13 +33,17 @@ type SessionDriver interface {
 
 var (
 	sdLock sync.Mutex
-	sds    = make(map[string]SessionDriver, 16)
+	sds    = make(map[string]Driver, 16)
 
-	sysSession SessionDriver = nil
+	sysSession Driver
 )
 
+func init() {
+	sysSession = nil
+}
+
 // Register regists a driver
-func Register(name string, driver SessionDriver) error {
+func Register(name string, driver Driver) error {
 	if name == "" {
 		return errors.New("Could not register a session driver with empty name.")
 	}
@@ -52,7 +56,7 @@ func Register(name string, driver SessionDriver) error {
 	defer sdLock.Unlock()
 
 	if _, exists := sds[name]; exists {
-		return fmt.Errorf("SessionDriver '%s' is already registered.", name)
+		return fmt.Errorf("Driver '%s' is already registered.", name)
 	}
 
 	sds[name] = driver

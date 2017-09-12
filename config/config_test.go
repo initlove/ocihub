@@ -15,10 +15,10 @@ func TestGetConnection(t *testing.T) {
 		err  error
 	}{
 		{DBConfig{"mysql", "user", "passwd", "server", "name"}, "user:passwd@tcp(server)/name?charset=utf8", nil},
-		{DBConfig{"mysql", "", "passwd", "server", "name"}, "", EMPTY_DB_USER_OR_PASSWD},
-		{DBConfig{"mysql", "user", "", "server", "name"}, "", EMPTY_DB_USER_OR_PASSWD},
-		{DBConfig{"mysql", "user", "passwd", "", "name"}, "", EMPTY_DB_SERVER},
-		{DBConfig{"mysql", "user", "passwd", "server", ""}, "", EMPTY_DB_NAME},
+		{DBConfig{"mysql", "", "passwd", "server", "name"}, "", ErrEmptyDBUserOrPassword},
+		{DBConfig{"mysql", "user", "", "server", "name"}, "", ErrEmptyDBUserOrPassword},
+		{DBConfig{"mysql", "user", "passwd", "", "name"}, "", ErrEmptyDBServer},
+		{DBConfig{"mysql", "user", "passwd", "server", ""}, "", ErrEmptyDBName},
 	}
 
 	for _, c := range cases {

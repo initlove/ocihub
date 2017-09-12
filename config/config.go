@@ -11,17 +11,17 @@ import (
 var (
 	// TODO: makes error better name.
 
-	// EmptyDbUserOrPassword represents the 'user' or 'password' empty error
-	EmptyDbUserOrPassword = errors.New("database 'User' or 'Password' should not be empty")
-	// EmptyDbName represents the 'name' empty error
-	EmptyDbName = errors.New("database 'Name' should not be empty")
-	// EmptyDbServer represents the 'database server' empty error
-	EmptyDbServer = errors.New("database 'Server' should not be empty")
+	// ErrEmptyDBUserOrPassword represents the 'user' or 'password' empty error
+	ErrEmptyDBUserOrPassword = errors.New("database 'User' or 'Password' should not be empty")
+	// ErrEmptyDBName represents the 'name' empty error
+	ErrEmptyDBName = errors.New("database 'Name' should not be empty")
+	// ErrEmptyDBServer represents the 'database server' empty error
+	ErrEmptyDBServer = errors.New("database 'Server' should not be empty")
 
-	// NonStorageBackend represents the 'storage backend' empty error
-	NonStorageBackend = errors.New("at least one storage backend required")
-	// NonSessionBackend represents the 'session backend' empty error
-	NonSessionBackend = errors.New("at least one session backend required")
+	// ErrNonStorageBackend represents the 'storage backend' empty error
+	ErrNonStorageBackend = errors.New("at least one storage backend required")
+	// ErrNonSessionBackend represents the 'session backend' empty error
+	ErrNonSessionBackend = errors.New("at least one session backend required")
 )
 
 // Config defines the config items
@@ -69,7 +69,7 @@ type StorageConfig map[string](map[string]interface{})
 // Valid checks the storage config validation
 func (cfg *StorageConfig) Valid() error {
 	if len(*cfg) == 0 {
-		return NonStorageBackend
+		return ErrNonStorageBackend
 	}
 
 	return nil
@@ -81,7 +81,7 @@ type SessionConfig map[string](map[string]interface{})
 // Valid checks the session config validation
 func (cfg *SessionConfig) Valid() error {
 	if len(*cfg) == 0 {
-		return NonSessionBackend
+		return ErrNonSessionBackend
 	}
 
 	return nil
@@ -99,14 +99,14 @@ type DBConfig struct {
 // GetConnection returns the sql recognizable connection string
 func (cfg *DBConfig) GetConnection() (string, error) {
 	if cfg.User == "" || cfg.Password == "" {
-		return "", EmptyDbUserOrPassword
+		return "", ErrEmptyDBUserOrPassword
 	}
 
 	if cfg.Name == "" {
-		return "", EmptyDbName
+		return "", ErrEmptyDBName
 	}
 	if cfg.Server == "" {
-		return "", EmptyDbServer
+		return "", ErrEmptyDBServer
 	}
 
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", cfg.User, cfg.Password, cfg.Server, cfg.Name), nil

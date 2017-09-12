@@ -15,7 +15,7 @@ func (r *Record) Match(ctx context.Context) error {
 	return nil
 }
 
-//  Expired checkes if a session is out of data
+// Expired checkes if a session is out of data
 func (r *Record) Expired() bool {
 	return false
 }

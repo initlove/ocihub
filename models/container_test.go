@@ -12,11 +12,11 @@ func TestQueryTagsList(t *testing.T) {
 	}
 
 	cases := []struct {
-		reponame      string
-		proto         string
-		proto_version string
-		output        []string
-		expected      bool
+		reponame     string
+		proto        string
+		protoVersion string
+		output       []string
+		expected     bool
 	}{
 		{"notexist", "oci", "v1", nil, true},
 		{"second/second", "oci", "v1", []string{"v0.1", "v0.2"}, true},
@@ -25,7 +25,7 @@ func TestQueryTagsList(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		tags, err := QueryTagsList(c.reponame, c.proto, c.proto_version)
+		tags, err := QueryTagsList(c.reponame, c.proto, c.protoVersion)
 		assert.Equal(t, c.output, tags)
 		assert.Equal(t, c.expected, err == nil)
 	}
@@ -71,17 +71,17 @@ func TestAddImage(t *testing.T) {
 	}
 
 	cases := []struct {
-		reponame      string
-		tag           string
-		proto         string
-		proto_version string
-		expected      bool
+		reponame     string
+		tag          string
+		proto        string
+		protoVersion string
+		expected     bool
 	}{
 		{"TestAddImage-A", "0.1", "test", "vtest", true},
 		{"TestAddImage-A", "0.1", "test", "vtest", true},
 	}
 	for _, c := range cases {
-		_, err := AddImage(c.reponame, c.tag, c.proto, c.proto_version)
+		_, err := AddImage(c.reponame, c.tag, c.proto, c.protoVersion)
 		assert.Equal(t, c.expected, err == nil)
 	}
 }

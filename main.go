@@ -3,15 +3,15 @@ package main
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/initlove/ocihub/config"
 	"github.com/initlove/ocihub/logger"
 	"github.com/initlove/ocihub/models"
 	"github.com/initlove/ocihub/routers"
 	"github.com/initlove/ocihub/session"
-	"github.com/initlove/ocihub/storage"
-
 	_ "github.com/initlove/ocihub/session/memory"
+	"github.com/initlove/ocihub/storage"
 	_ "github.com/initlove/ocihub/storage/driver/filesystem"
 )
 

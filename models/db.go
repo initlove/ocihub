@@ -6,9 +6,9 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	_ "github.com/go-sql-driver/mysql"
 )
 
+// InitDB regists the orm db driver and regists to the database
 func InitDB(conn string, driver string, name string) error {
 	if driver != "mysql" {
 		return errors.New("Only support mysql yet.")

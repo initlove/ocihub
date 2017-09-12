@@ -5,20 +5,22 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-// ContainerRepo: the container repo, should support dockerv2, ociv1.
+// ContainerRepo defines the container repo struct,
+// will support dockerv2, ociv1.
 type ContainerRepo struct {
-	Id          int    `orm:"column(id);auto"`
+	ID          int    `orm:"column(id);auto"`
 	Name        string `orm:"unique;column(name);size(255);null"`
 	Star        int    `orm:"column(star);null"`
 	DownloadNum int    `orm:"column(download_num);null"`
 	Description string `orm:"column(description);null"`
 }
 
+// ContainerImage defines the container image struct.
 type ContainerImage struct {
-	Id     int    `orm:"column(id);auto"`
+	ID     int    `orm:"column(id);auto"`
 	Tag    string `orm:"column(tag);size(255);null"`
 	Size   int64  `orm:"column(size);null"`
-	RepoId int    `orm:"column(repo_id);null"`
+	RepoID int    `orm:"column(repo_id);null"`
 
 	// docker, oci, rkt...
 	Proto        string `orm:"column(proto);size(15);null"`
@@ -42,9 +44,10 @@ const (
 	     where repo_id=? and tag=? and proto=? and proto_version=? limit 1`
 )
 
-func QueryTagsList(reponame string, proto string, proto_version string) ([]string, error) {
+// QueryTagsList returns the tags list by 'reponame, proto and proto version'
+func QueryTagsList(reponame string, proto string, protoVerion string) ([]string, error) {
 	var tags []string
-	_, err := orm.NewOrm().Raw(queryContainerTagsList, reponame, proto, proto_version).QueryRows(&tags)
+	_, err := orm.NewOrm().Raw(queryContainerTagsList, reponame, proto, protoVerion).QueryRows(&tags)
 
 	if err != nil && err != orm.ErrNoRows {
 		logs.Error("[QueryTagsList] %s", err)
@@ -54,6 +57,7 @@ func QueryTagsList(reponame string, proto string, proto_version string) ([]strin
 	return tags, nil
 }
 
+// QueryReposList returns the repos list
 func QueryReposList() ([]string, error) {
 	var names []string
 	_, err := orm.NewOrm().Raw(queryContainerReposList).QueryRows(&names)
@@ -66,6 +70,7 @@ func QueryReposList() ([]string, error) {
 	return names, nil
 }
 
+// AddRepo adds a repo to the database
 func AddRepo(reponame string) (*ContainerRepo, error) {
 	repo := &ContainerRepo{}
 
@@ -87,10 +92,11 @@ func AddRepo(reponame string) (*ContainerRepo, error) {
 	return repo, nil
 }
 
-func QueryImage(repoid int, tag string, proto string, proto_version string) (*ContainerImage, error) {
+// QueryImage returns a container image by 'repoid, tag, proto and proto version'
+func QueryImage(repoid int, tag string, proto string, protoVerion string) (*ContainerImage, error) {
 	var images []ContainerImage
 
-	_, err := orm.NewOrm().Raw(queryContainerImage, repoid, tag, proto, proto_version).QueryRows(&images)
+	_, err := orm.NewOrm().Raw(queryContainerImage, repoid, tag, proto, protoVerion).QueryRows(&images)
 
 	if err != nil && err != orm.ErrNoRows {
 		logs.Error("[QueryImage] %v", err)
@@ -105,14 +111,15 @@ func QueryImage(repoid int, tag string, proto string, proto_version string) (*Co
 	return &images[0], nil
 }
 
+// AddImage adds an image to the database. If the target repo is not exist, it will create a repo.
 //TODO: lots of rollback
-func AddImage(reponame string, tags string, proto string, proto_version string) (*ContainerImage, error) {
+func AddImage(reponame string, tags string, proto string, protoVerion string) (*ContainerImage, error) {
 	repo, err := AddRepo(reponame)
 	if err != nil {
 		return nil, err
 	}
 
-	if img, err := QueryImage(repo.Id, tags, proto, proto_version); err != nil {
+	if img, err := QueryImage(repo.ID, tags, proto, protoVerion); err != nil {
 		logs.Error("[AddImage] %v", err)
 		return nil, err
 	} else if img != nil {
@@ -122,10 +129,10 @@ func AddImage(reponame string, tags string, proto string, proto_version string) 
 	}
 
 	image := &ContainerImage{}
-	image.RepoId = repo.Id
+	image.RepoID = repo.ID
 	image.Tag = tags
 	image.Proto = proto
-	image.ProtoVersion = proto_version
+	image.ProtoVersion = protoVerion
 	if _, err := orm.NewOrm().Insert(image); err != nil {
 		logs.Error("[AddImage] fail to insert image '%s:%s': %v", reponame, tags, err)
 		return nil, err
