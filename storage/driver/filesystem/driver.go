@@ -46,9 +46,8 @@ func (d *driver) Init(parameters map[string]interface{}) error {
 			if v, ok := data.(string); ok && v != "" {
 				d.rootDirectory = v
 				return nil
-			} else {
-				return errors.New("invalid 'rootDirectory' data, should be non-empty string")
 			}
+			return errors.New("invalid 'rootDirectory' data, should be non-empty string")
 		}
 	}
 
@@ -61,9 +60,8 @@ func (d *driver) Valid(parameters map[string]interface{}) error {
 		if data != nil {
 			if v, ok := data.(string); ok && v != "" {
 				return nil
-			} else {
-				return errors.New("invalid 'rootDirectory' data, should be non-empty string")
 			}
+			return errors.New("invalid 'rootDirectory' data, should be non-empty string")
 		}
 	}
 
